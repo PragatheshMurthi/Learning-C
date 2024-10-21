@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <conio.h>
-
+#include <string.h>
 /* Basic data types */
 typedef int             INT32;
 typedef unsigned int    UINT32;
@@ -41,5 +41,6 @@ typedef struct tstReturn
 
 typedef enum tsterrorcode
 {
-    /* 0X00000000 */    TST_NO_ERROR
+    /* 0X00000000 */        TST_NO_ERROR
+    /* 0X00000001 */    ,   TST_ERROR_BAD_PARAMETER
 }TST_ERROR_CODE;

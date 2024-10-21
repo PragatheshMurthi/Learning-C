@@ -13,7 +13,7 @@ CPCHAR cpCFileName = "STR2DEC.C";
 #define TST_NUMERIC_ASCII_END   '9'
 /*==========PROTOTYPES================*/
 
-TST_ERROR_CODE TST_ConvertStrint2Deci ( CPCHAR cpcDecimalStrint );
+TST_ERROR_CODE TST_ConvertStrint2Deci ( CPCHAR cpcDecimalStrint, TST_RETURN* pstOriginalRet );
 UINT32  TST_NthRootOfBase ( UINT32 ui32Base, UINT32 ui32Pow );
 /*==========DEFENITIONS===============*/
 
@@ -29,23 +29,32 @@ INT32 main (INT32 argc, PCHAR argv[])
     UINT8       ui8LocLoooping      = 0;
     
     printf("ENTER THE INPUT NUMARIC STRING:");
-    scanf("%s",acInputInteger);
 
-    if ( TST_NO_ERROR != TST_ConvertStrint2Deci ( acInputInteger , &stGenericVar ))
+    while ( 1 )
+    {
+        scanf("%s",acInputInteger); 
+        if ( TST_NO_ERROR == TST_ConvertStrint2Deci ( acInputInteger , &stGenericVar ))
+        {
+            break;
+        }
+        memset (&stGenericVar, 0, sizeof(stGenericVar));
+        printf("BAD PARAM ENTERED: RE-ENTER \n");
+    }
 
-    if ( stOriginalRet.enReturnType = TST_FLOAT )
+    if ( stGenericVar.enReturnType == TST_FLOAT )
     {
-        printf ("FLT[%f]",stOriginalRet.genDatatype.vfReturn );
+        printf ("FLT[%f]",stGenericVar.genDatatype.vfReturn );
     }
-    else if ( stOriginalRet.enReturnType = TST_INT )
+    else if ( stGenericVar.enReturnType == TST_UNSIGNED_INT )
     {
-        printf ("UINT[%u]",stOriginalRet.genDatatype.ui32Return );
+        printf ("UINT[%u]",stGenericVar.genDatatype.ui32Return );
     }
-    else if ( stOriginalRet.enReturnType = TST_UNSIGNED_INT )
+    else if ( stGenericVar.enReturnType == TST_INT )
     {
-        printf ("INT[%d]",stOriginalRet.genDatatype.i32Return );        
+        printf ("INT[%d]",stGenericVar.genDatatype.i32Return );        
     }
     
+    getchar();
     getchar();
     return 0;
 }
@@ -74,30 +83,60 @@ TST_ERROR_CODE TST_ConvertStrint2Deci ( CPCHAR cpcDecimalStrint, TST_RETURN* pst
 
     while ( '\0' != cpcDecimalStrint [ ui8LocLoooping ] )
     {
-        if (( TST_NUMERIC_ASCII_START <=acInputInteger[ ui8LocLoooping ] ) &&\
+        if (( TST_NUMERIC_ASCII_START <= cpcDecimalStrint [ ui8LocLoooping ] ) &&\
             ( TST_NUMERIC_ASCII_END >= cpcDecimalStrint [ ui8LocLoooping ] ))
         {
             UINT8 ui8CurrDecVal = cpcDecimalStrint [ ui8LocLoooping ] - TST_NUMERIC_ASCII_START;
             
-            ( TST_INT == pstOriginalRet->enReturnType ? pstOriginalRet->genDatatype.i32Return :\
+/* Faced lvalue required compilation error ( Need to debug ) - 20/10/2024 - 17:56 */
+#if 0
+            ( TST_INT == pstOriginalRet->enReturnType ) ? pstOriginalRet->genDatatype.i32Return :\
                 TST_UNSIGNED_INT == pstOriginalRet->enReturnType ? pstOriginalRet->genDatatype.ui32Return :\
-                pstOriginalRet->genDatatype.fvReturn ) *= 10;
+                pstOriginalRet->genDatatype.vfReturn ) *= 10;
 
             ( TST_INT == pstOriginalRet->enReturnType ? pstOriginalRet->genDatatype.i32Return :\
                 TST_UNSIGNED_INT == pstOriginalRet->enReturnType ? pstOriginalRet->genDatatype.ui32Return :\
-                pstOriginalRet->genDatatype.fvReturn ) += ui8CurrDecVal;
+                pstOriginalRet->genDatatype.vfReturn ) += ui8CurrDecVal;
+#else
+            if ( TST_INT == pstOriginalRet->enReturnType ) 
+            {
+                pstOriginalRet->genDatatype.i32Return *= 10;        
+                pstOriginalRet->genDatatype.i32Return += ui8CurrDecVal;
+            }
+            else if (( TST_UNSIGNED_INT == pstOriginalRet->enReturnType ) ||\
+                    ( TST_FLOAT == pstOriginalRet->enReturnType ))
+            {
+                pstOriginalRet->genDatatype.ui32Return *= 10;
+                pstOriginalRet->genDatatype.ui32Return += ui8CurrDecVal;
+            }
+#endif
         }
         else if ( '.' == cpcDecimalStrint [ ui8LocLoooping ] )
         {
+            if ( TST_INT == pstOriginalRet->enReturnType )
+            {
+                return TST_ERROR_BAD_PARAMETER;
+            }
+            
             pstOriginalRet->enReturnType = TST_FLOAT;
             ui8DotCount = ui8LocLoooping;
+        }
+        else
+        {
+            return TST_ERROR_BAD_PARAMETER;
         }
         ++ui8LocLoooping; 
     }
 
-    if ( pstOriginalRet->enReturnType = TST_FLOAT )
+    if ( ui8DotCount )
     {
-        pstOriginalRet->genDatatype.vfReturn /= (FLOATV)TST_NthRootOfBase( 10, ui8DotCount );        
+        ui8DotCount = ( ui8LocLoooping - 1 ) - ui8DotCount ;
+        pstOriginalRet->genDatatype.vfReturn = (FLOATV)pstOriginalRet->genDatatype.ui32Return / (FLOATV)TST_NthRootOfBase( 10, ui8DotCount );        
+    }
+
+    if ( TST_INT == pstOriginalRet->enReturnType )
+    {
+        pstOriginalRet->genDatatype.i32Return *= -1;
     }
 
     return TST_NO_ERROR;
@@ -110,7 +149,7 @@ TST_ERROR_CODE TST_ConvertStrint2Deci ( CPCHAR cpcDecimalStrint, TST_RETURN* pst
 UINT32  TST_NthRootOfBase ( UINT32 ui32Base, UINT32 ui32Pow )
 {
     UINT32  ui32LocMul     = ( ui32Base > ui32Pow ) ? ui32Base : ui32Pow ,
-            ui32LocLp      = ( ui32Base > ui32Pow ) ? ui32Pow : ui32Base,
+            ui32LocLp      = (( ui32Base > ui32Pow ) ? ui32Pow : ui32Base) - 1,
             ui32LocBase    = ui32LocMul;
 
     while ( 0 < ui32LocLp )
@@ -120,6 +159,5 @@ UINT32  TST_NthRootOfBase ( UINT32 ui32Base, UINT32 ui32Pow )
     }
     return ui32LocBase;
 }
-
 
 

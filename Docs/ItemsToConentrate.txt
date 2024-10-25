@@ -1,0 +1,8 @@
+1) Floating ponint expansion. Constant decleration.
+2) working of printf, variable aguments and ellipse concept.
+
+Notes:
+------
+1) No interger can be used as first char for variables.
+2) Float does not have unsigned modifiers thus will store signed values.
+3)

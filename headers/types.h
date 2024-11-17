@@ -1,28 +1,48 @@
 #ifndef _TYPES_HEADER_
 #define _TYPES_HEADER_
 
+/*
+ * FILE NAME : AllTheTypes.header
+ * DEC       : We have added all the root structures required for the repository is available here.
+ */
+/*==============INCLUDES=============*/
 #include <stdio.h>
 #include <conio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define OS_TIME_STAMP_MAX 
-#define OS_LOG_MSG_MAX 1024
+/*==============DEFINES=============*/
+
+#define OS_TRUE     1
+#define OS_FALSE    0
+/*==============TYPEDEFS=============*/
 
 /* Basic data types */
-typedef int             INT32;
-typedef unsigned int    UINT32;
+typedef float               FLOATV;
 
-typedef float           FLOATV;
-typedef char            INT8;
+typedef int                 INT32;
+typedef unsigned int        UINT32;
 
-typedef unsigned char   UINT8;
-typedef char            CHAR;
+typedef short int           INT16;
+typedef short unsigned int  UINT16;
 
+typedef char                INT8;
+typedef unsigned char       UINT8;
+
+typedef char                CHAR;
+
+typedef unsigned int        eBOOLEAN;
 /*Pointers*/
-typedef char* PCHAR;
+typedef char*               PCHAR;
 
 /*Constatnt materiels*/
-typedef const char* CPCHAR;
+typedef const char*         CPCHAR;
+typedef const char const*   CPCCHAR;
+
+typedef void                VOID;
+typedef void*               PVOID;
+
+/*==============UNIONS=============*/
 
 /* Union for desired datatype return */
 typedef union tstdatatypes
@@ -32,6 +52,8 @@ typedef union tstdatatypes
     FLOATV  vfReturn;    
 }TST_DATA_TYPES;
 
+/*==============ENUMERATIONS=============*/
+
 typedef enum tstreturntype
 {
     /* 0X1 */       TST_INT
@@ -39,17 +61,20 @@ typedef enum tstreturntype
     /* 0X3 */   ,   TST_UNSIGNED_INT
 }TST_RETURN_TYPE;
 
-/* This sturcture can be used for returning either float ,signed int or unsigned int */
+typedef enum oserrorcode
+{
+    /* 0X00000000 */       OS_NO_ERROR
+    /* 0X00000001 */    ,  OS_ERROR_BAD_PARAMETER
+}OS_ERROR_CODE;
+
+/*==============STRUCTURES=============*/
+
+/* This structure can be used for returning either float ,signed int or unsigned int */
 typedef struct tstReturn
 {
     TST_DATA_TYPES  genDatatype;
     TST_RETURN_TYPE enReturnType;
 }TST_RETURN;
 
-typedef enum tsterrorcode
-{
-    /* 0X00000000 */        TST_NO_ERROR
-    /* 0X00000001 */    ,   TST_ERROR_BAD_PARAMETER
-}TST_ERROR_CODE;
-
 #endif /* #ifdef _TYPES_HEADER_ */
+

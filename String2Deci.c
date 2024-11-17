@@ -1,21 +1,31 @@
 /*
  * This is a program to convert string to number without using atoi
- *
+ */
 /*===============INCLUDES============*/
 
 #include "types.h"
+
+/* including c source file is not advisable. But since I dont have a make 
+ * system, anyway it sucks in windows 32bit environment, Iam including c file.
+ */
+#ifndef TNG_OWN_MAKE_SUPPORTED
+//#include <comfun.c>
+#else
+#include <comfun.h> 
+#endif /* #ifndef TNG_OWN_MAKE_SUPPORTED */
+
 /*==============INLINE===============*/
 
-CPCHAR cpCFileName = "STR2DEC.C";
+CPCHAR gsCpcFileName = "STR2DEC.C";
 /*==========MACROS====================*/
 
 #define TST_NUMERIC_ASCII_START '0'
 #define TST_NUMERIC_ASCII_END   '9'
 /*==========PROTOTYPES================*/
 
-TST_ERROR_CODE TST_ConvertStrint2Deci ( CPCHAR cpcDecimalStrint, TST_RETURN* pstOriginalRet );
+TST_ERROR_CODE TST_ConvertString2Deci ( CPCHAR cpcDecimalString, TST_RETURN* pstOriginalRet );
 UINT32  TST_NthRootOfBase ( UINT32 ui32Base, UINT32 ui32Pow );
-/*==========DEFENITIONS===============*/
+/*==========DEFINITIONS===============*/
 
 /*
  * API NAME: main
@@ -25,15 +35,15 @@ INT32 main (INT32 argc, PCHAR argv[])
 {
     TST_RETURN  stGenericVar        = {0};
     CHAR        acInputInteger[20];
-    UINT32      ui32Integior        = 0;
-    UINT8       ui8LocLoooping      = 0;
-    
-    printf("ENTER THE INPUT NUMARIC STRING:");
+    UINT32      ui32Integer        = 12;
+    UINT8       ui8LocLooping      = 0;
+     
+    OS_MessageLogging("%s %d>$TNG$<ENTER THE INPUT NUMERIC STRING>",gsCpcFileName, __LINE__ );
 
     while ( 1 )
     {
         scanf("%s",acInputInteger); 
-        if ( TST_NO_ERROR == TST_ConvertStrint2Deci ( acInputInteger , &stGenericVar ))
+        if ( TST_NO_ERROR == TST_ConvertString2Deci ( acInputInteger , &stGenericVar ))
         {
             break;
         }
@@ -60,33 +70,33 @@ INT32 main (INT32 argc, PCHAR argv[])
 }
 
 /*
- * API NAME: TST_ConvertStrint2Deci
- * DES: To find the numarical value from the given strint input
+ * API NAME: TST_ConvertString2Deci
+ * DES: To find the numerical value from the given string input
  */
-TST_ERROR_CODE TST_ConvertStrint2Deci ( CPCHAR cpcDecimalStrint, TST_RETURN* pstOriginalRet )
+TST_ERROR_CODE TST_ConvertString2Deci ( CPCHAR cpcDecimalString, TST_RETURN* pstOriginalRet )
 {
-    UINT32  ui32Integior    = 0;
-    UINT8   ui8LocLoooping  = 0;
+    UINT32  ui32Integer    = 0;
+    UINT8   ui8LocLooping  = 0;
     UINT8   ui8DotCount     = 0;
     TST_RETURN stOriginalRet;
 
     /* Validate weather the given string is negative or not*/
-    if ( '-' == cpcDecimalStrint [ ui8LocLoooping ] )
+    if ( '-' == cpcDecimalString [ ui8LocLooping ] )
     {
         pstOriginalRet->enReturnType = TST_INT;
-        ++ui8LocLoooping;
+        ++ui8LocLooping;
     }
     else
     {
         pstOriginalRet->enReturnType = TST_UNSIGNED_INT;
     }
 
-    while ( '\0' != cpcDecimalStrint [ ui8LocLoooping ] )
+    while ( '\0' != cpcDecimalString [ ui8LocLooping ] )
     {
-        if (( TST_NUMERIC_ASCII_START <= cpcDecimalStrint [ ui8LocLoooping ] ) &&\
-            ( TST_NUMERIC_ASCII_END >= cpcDecimalStrint [ ui8LocLoooping ] ))
+        if (( TST_NUMERIC_ASCII_START <= cpcDecimalString [ ui8LocLooping ] ) &&\
+            ( TST_NUMERIC_ASCII_END >= cpcDecimalString [ ui8LocLooping ] ))
         {
-            UINT8 ui8CurrDecVal = cpcDecimalStrint [ ui8LocLoooping ] - TST_NUMERIC_ASCII_START;
+            UINT8 ui8CurrDecVal = cpcDecimalString [ ui8LocLooping ] - TST_NUMERIC_ASCII_START;
             
 /* Faced lvalue required compilation error ( Need to debug ) - 20/10/2024 - 17:56 */
 #if 0
@@ -111,7 +121,7 @@ TST_ERROR_CODE TST_ConvertStrint2Deci ( CPCHAR cpcDecimalStrint, TST_RETURN* pst
             }
 #endif
         }
-        else if ( '.' == cpcDecimalStrint [ ui8LocLoooping ] )
+        else if ( '.' == cpcDecimalString [ ui8LocLooping ] )
         {
             if ( TST_INT == pstOriginalRet->enReturnType )
             {
@@ -119,18 +129,18 @@ TST_ERROR_CODE TST_ConvertStrint2Deci ( CPCHAR cpcDecimalStrint, TST_RETURN* pst
             }
             
             pstOriginalRet->enReturnType = TST_FLOAT;
-            ui8DotCount = ui8LocLoooping;
+            ui8DotCount = ui8LocLooping;
         }
         else
         {
             return TST_ERROR_BAD_PARAMETER;
         }
-        ++ui8LocLoooping; 
+        ++ui8LocLooping; 
     }
 
     if ( ui8DotCount )
     {
-        ui8DotCount = ( ui8LocLoooping - 1 ) - ui8DotCount ;
+        ui8DotCount = ( ui8LocLooping - 1 ) - ui8DotCount ;
         pstOriginalRet->genDatatype.vfReturn = (FLOATV)pstOriginalRet->genDatatype.ui32Return / (FLOATV)TST_NthRootOfBase( 10, ui8DotCount );        
     }
 
@@ -159,5 +169,4 @@ UINT32  TST_NthRootOfBase ( UINT32 ui32Base, UINT32 ui32Pow )
     }
     return ui32LocBase;
 }
-
 

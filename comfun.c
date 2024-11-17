@@ -4,22 +4,22 @@
  */
 /*==============INCLUDES=============*/
 #include <types.h>
+#include <comfun.h>
+
 /*==============INTERNAL=============*/
-#ifndef TNG_OWN_MAKE_SUPPORTED
-static CPCHAR gscpCFileName = "COMFUN.C"
+#ifdef TNG_OWN_MAKE_SUPPORTED
+static CPCHAR gsCpCcFileName = "COMFUN.C";
 #endif /* #ifndef TNG_OWN_MAKE_SUPPORTED */
 
 /*===============MACROS==============*/
-
-/*=============PROTOTYPES============*/
 
 /*=============DEFINITIONS===========*/
 /*
  * API NAME: GetIntegerAsInput 
  * DES: If user gives even sting as input avoid those chars and stores only integer.
- * Confession : This code is taken from other sources and not written on own.
+ * Confession : This code is taken from chatgpt and not written on own.
  */
-UINT32 TNG_GetIntegerInput ( VOID )
+UINT32 OS_GetIntegerInput ( VOID )
 {
     char input[20]; // Buffer to hold input
     int index = 0;
@@ -58,14 +58,182 @@ UINT32 TNG_GetIntegerInput ( VOID )
  */
 INT32 OS_MessageLogging ( const PCHAR CpcFormat, ... )
 {
-    CHAR    acLogBuffer[ 1024/* For log message of 1kb */ + 1 /* For null */ ];
+    CHAR    acLogBuffer [ OS_LOG_MSG_MAX + 1 ];
+    CHAR    acDateBuffer [ OS_TIME_STAMP_MAX + 1 ];
+    CHAR    acLogBufferWithDate [ OS_LOG_MSG_MAX + OS_TIME_STAMP_MAX + 1 ];
     INT32   i32InLength;
 
+    /* Initializes the argument list */
     va_list args;
     va_start ( args, CpcFormat );
     
-    vsnprinf ( acLogBuffer, sizeof ( acLogBuffer ), CpcFormat, args );
-    
+    /* copies to the buffer so that it can either be routed via desirable formats. */
+    vsnprintf ( acLogBuffer, sizeof ( acLogBuffer ), CpcFormat, args );
+
+    /* Get the current real time */
+    OS_GetCurrentDateTime ( acDateBuffer );
+
+    /* Combine the date format with the logging buffer */
+    i32InLength = snprintf ( acLogBufferWithDate, sizeof(acLogBufferWithDate), "[%s] %s", acDateBuffer, acLogBuffer );
     va_end ( args );
+
+    /* route to console */
+    printf("%s\n", acLogBufferWithDate );
+
     return i32InLength;
+}
+
+/*
+ * API NAME: Get Current date and time
+ * DES: returns the current date and time in DDMMMYYYY-HH:MM:SS format
+ * Confession : This code is taken from chatgpt and modified according to need not written on own.
+ */
+VOID OS_GetCurrentDateTime( PCHAR pcDateTime ) 
+{
+    // Get the current time 
+    time_t now = time(NULL);
+
+    // Check if the time was retrieved successfully
+    if (now == (time_t)(-1)) 
+    {
+        /* Return the epoch time in error case */
+        sprintf(pcDateTime,"01JAN1970-12:00:00");
+        return;
+    }
+
+    // Convert the time to local time structure
+    struct tm *localTime = localtime(&now);
+    if (localTime == NULL) 
+    {
+        /* Return the epoch time in error case */
+        sprintf(pcDateTime,"01JAN1970-12:00:00");
+        return;
+    }
+    //strftime ( pcDateTime, ( OS_TIME_STAMP_MAX + 1 ), "%d%^b%Y::%H:%M:%S", localTime);
+    snprintf(pcDateTime, ( OS_TIME_STAMP_MAX + 1 ),"%02u%s%u-%02u:%02u:%02u",
+                                                    localTime->tm_mday,
+                                                    OS_FindMonString((UINT8)localTime->tm_mon),
+                                                    1900 + localTime->tm_year,
+                                                    localTime->tm_hour,
+                                                    localTime->tm_min,
+                                                    localTime->tm_sec);
+    return;
+}
+
+/*
+ * API NAME: find month's string value.
+ * DES: To return the string value of the given month's numerical value.
+ */
+CPCHAR OS_FindMonString ( UINT8 ui8Month )
+{
+    CPCHAR CpcLocMonthStr;
+    switch( ui8Month )
+    {
+        case 0:
+        {
+            CpcLocMonthStr = "JAN";
+        }
+            break;
+        case 2:
+        {
+            CpcLocMonthStr = "FEB";
+        }
+            break;
+        case 3:
+        {
+            CpcLocMonthStr = "MAR";
+        }
+            break;
+        case 4:
+        {
+            CpcLocMonthStr = "APR";
+        }
+            break;
+        case 5:
+        {
+            CpcLocMonthStr = "MAY";
+        }
+            break;
+        case 6:
+        {
+            CpcLocMonthStr = "JUN";
+        }
+            break;
+        case 7:
+        {
+            CpcLocMonthStr = "JUL";
+        }
+            break;
+        case 8:
+        {
+            CpcLocMonthStr = "AUG";
+        }
+            break;
+        case 9:
+        {
+            CpcLocMonthStr = "SEP";
+        }
+            break;
+        case 10:
+        {
+            CpcLocMonthStr = "NOV";
+        }
+            break;
+        case 11:
+        {
+            CpcLocMonthStr = "DEC";
+        }
+            break;
+        default:
+        {
+            CpcLocMonthStr = "UNK";
+        }                                                                                                                                        
+    }
+    return CpcLocMonthStr;
+}
+
+/*
+ * API NAME: Is Fatal error
+ * DES: Is the error returned is fatal?
+ */
+eBOOLEAN OS_IsFatal( OS_ERROR_CODE enErrorCode )
+{
+    switch ( enErrorCode )
+    {
+        case OS_NO_ERROR:
+        {
+            return OS_FALSE;
+        }
+        case OS_ERROR_BAD_PARAMETER:
+        default:
+        {
+            return OS_TRUE;
+        }
+    }
+    return OS_TRUE;
+}
+
+/*
+ * API NAME: Convert error code to string.
+ * DES: Convert error code to string.
+ */
+CPCHAR OS_Error2Str ( OS_ERROR_CODE enErrorCode )
+{
+    switch ( enErrorCode )
+    {
+        case OS_NO_ERROR:
+        {
+            return "OS_NO_ERROR";
+        }
+            break;
+        case OS_ERROR_BAD_PARAMETER:
+        {
+            return "OS_ERROR_BAD_PARAMETER";
+        }
+            break;
+        default:
+        {
+            return "ERROR NOT REGISTERED";            
+        }    
+    }
 }

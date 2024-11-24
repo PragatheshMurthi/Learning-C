@@ -22,6 +22,10 @@ ifeq "$(TNG_COMPILE_FIBONACCI_SERIES)" "$(ENABLE)"
 SOURCES +=fibser.c
 endif
 
+ifeq "$(TNG_BIT_MANIPULATION_TEST)" "$(ENABLE)"
+SOURCES +=bitw.c
+endif
+
 ## Add the compiler flags  here
 CFLAGS:=-DTNG_OWN_MAKE_SUPPORTED
 

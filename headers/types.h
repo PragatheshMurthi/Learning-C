@@ -15,6 +15,8 @@
 
 #define OS_TRUE     1
 #define OS_FALSE    0
+#define OS_NULL     0
+
 /*==============TYPEDEFS=============*/
 
 /* Basic data types */
@@ -32,8 +34,12 @@ typedef unsigned char       UINT8;
 typedef char                CHAR;
 
 typedef unsigned int        eBOOLEAN;
+
 /*Pointers*/
+typedef UINT32*             PUINT32;
+
 typedef char*               PCHAR;
+typedef unsigned char*      PUINT8;
 
 /*Constatnt materiels*/
 typedef const char*         CPCHAR;

@@ -237,3 +237,36 @@ CPCHAR OS_Error2Str ( OS_ERROR_CODE enErrorCode )
         }    
     }
 }
+
+/*
+ * API NAME: Heep allocation.
+ * DES: To allocate memory from heep with common wrapper.
+ */
+PVOID OS_Allocate ( UINT32 ui32Size )
+{
+    if ( ui32Size )
+    {
+        PVOID pvAddress = malloc ( ui32Size );
+        pvAddress ? memset ( pvAddress, 0, ui32Size ) : 0;
+        return pvAddress;
+    }
+
+    OS_MessageLogging("%s %d>$TNG-ALLOC$<KO[IVSz]>",gsCpCcFileName,__LINE__);
+    return OS_NULL;
+}
+
+/*
+ * API NAME: Heep Free.
+ * DES: To free memory to heep with common wrapper.
+ */
+VOID OS_Free ( PVOID pvAddress )
+{
+    if ( pvAddress )
+    {
+        free ( pvAddress );
+        return;
+    }
+
+    OS_MessageLogging("%s %d>$TNG-FREE$<KO[IVAdd]>",gsCpCcFileName,__LINE__);
+    return;
+}

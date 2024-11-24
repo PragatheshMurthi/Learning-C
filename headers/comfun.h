@@ -34,6 +34,8 @@ INT32 OS_MessageLogging ( const PCHAR CpcFormat, ... );
 CPCHAR OS_FindMonString ( UINT8 ui8Month );
 eBOOLEAN OS_IsFatal( OS_ERROR_CODE enErrorCode );
 CPCHAR OS_Error2Str ( OS_ERROR_CODE enErrorCode );
+PVOID OS_Allocate ( UINT32 ui32Size );
+VOID OS_Free ( PVOID pvAddress );
 /*=============DEFINITIONS===========*/
 
 #endif /* _COMFUN_HEADER_ */

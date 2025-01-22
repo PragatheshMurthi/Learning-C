@@ -15,8 +15,9 @@
 
 #define OS_TRUE     1
 #define OS_FALSE    0
-#define OS_NULL     0
+#define OS_NULL     NULL
 
+#define OS_INVALID_INSTANCE OS_NULL
 /*==============TYPEDEFS=============*/
 
 /* Basic data types */
@@ -48,6 +49,8 @@ typedef const char const*   CPCCHAR;
 typedef void                VOID;
 typedef void*               PVOID;
 
+/* For any instance created with structure address as handle. */
+typedef PVOID               OS_INSTANCE;
 /*==============UNIONS=============*/
 
 /* Union for desired datatype return */
@@ -71,6 +74,7 @@ typedef enum oserrorcode
 {
     /* 0X00000000 */       OS_NO_ERROR
     /* 0X00000001 */    ,  OS_ERROR_BAD_PARAMETER
+    /* 0X00000002 */    ,  OS_ERROR_MODULE_NOT_INITIALIZED
 }OS_ERROR_CODE;
 
 /*==============STRUCTURES=============*/

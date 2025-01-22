@@ -2,19 +2,18 @@
 2) working of printf, variable arguments and ellipse concept.
 3) Recursion functions.
 4) Preprocessors(__FILE__, PRAGMA_PACK)
-5) Function pointers
-6) Bit fields
+l6) Bit fields
 
 Notes:
 ------
-1) No integer can be used as first char for variables.
-2) Float does not have unsigned modifiers thus will store signed values.
+1) No integer can be used as first char for variables.on
+2) Float does not have unsigned modifiers thus will store only signed values.
 3) Passing a whole array to a function and receiving the array as whole will only pass the base address of the array to the function not array values. int sample ( int array [10] ); will only receive the passed array's base address not the integer values stored in it.
 4) Main can be called recursively.
 5) Recursively called function is slower than the loop and occupies more memory than loop.
 6) Functions can have definitions without return type. By default int is taken as return. But warning may arise due to the return type conflict if any datatypes other than int is returned.
 7) Its true that pointers cannot be added, multiplied or divided. This is because those operation's result is not useful. But a Variable can be operated with a pointer.
-8) A ^= B; B ^= A; A ^ B; gives the swap without temp variable.
+8) A ^= B; B ^= A; A ^= B; gives the swap without temp variable.
 9) Constants:
 	9.1) If a address's value stored in a pointer cannot be changed, then it is called pointer to constant (const char* ptr = array;). The array index's value cannot be changed in this case.
 	9.2) Variables can also be declared with const. eg const int a = 10; If declared const the value of a cannot be changed during runtime.
@@ -46,16 +45,20 @@ struct Parent
 19) Volatile keyword explicitly tells the compiler that the variable should never go optimization as the value might change by an outside entity/program. The detailed explanation is given in "Volatile.txt".
 20) Stringizing operator make the test to enclose with double quotes. eg #define Stringizing(A) (#A)\ Stringizing(string) is equivalent to "string"
 21) Token-pasting operator will combine the two arguments and make them as one. eg #define Tokenize(A,B) (A##B) \ int Tokenize(ui32,Token) = 10; this is equal to int ui32Token =10;
-22) Registers are actually a provision to store the variables value in CPI register giving the program to run faster as the register memory is accessed faster than the ram. But it is compiler implementation dependent to avoid the register keyword and make it auto. Loop variables are good to declare with register it seems. static register int a; is not allowed and declaring register as global is not allowed.
+22) Registers are actually a provision to store the variables value in CPU register giving the program to run faster as the register memory is accessed faster than the ram. But it is compiler implementation dependent to avoid the register keyword and make it auto. Loop variables are good to declare with register it seems. static register int a; is not allowed and declaring register as global is not allowed.
 23) Preprocessor directive pragma has many suffix. These suffix is compiler dependent.
 	23.1) #pragma once -> This will only include header file once.
-	23.2) #pragma startup func() -> This will call the function before main. In gcc compilers void __attribute__((constructor)) fun(); is used instead	23.3) #pragma exit func() -> Similar to startup, this will be executed after main.
+	23.2) #pragma startup func() -> This will call the function before main. In gcc compilers void __attribute__((constructor)) fun(); is used instead	
+	23.3) #pragma exit func() -> Similar to startup, this will be executed after main.
 	23.4) #pragma warn -xxx -> will remove the xxx specified warnings. xxx is the short form of warnings tag. rvl in xxx tells to avoid return value warnings. Appending - instead of + will enable warn and . will toggle them.
 	23.5) #pragma pack(push,1) -> tells the compiler to pack the structure without padding. Allowed options are 1,2,4,8,16.
 	23.6) #pragma pack(pop) -> tells the compiler to revert back to natural padding.
 24) __STDC__ tests the compiler and returns 1 if the compiler is under ANSII C compliance and 0 if it is not.
 25) FILE* is OS dependent but major members wont change it seems. Some of them are buffer(Temp data area for read/write), buffer_size, buffer_pos, file_pos, flags(e.g., EOF, error, read/write mode), mode[3](r,rw,rb), eof and error flags.
-
+26) Inside printf, we cannot use multiline macro with or without arguments. This will result in error.
+27) (*array)[10] is the declaration of pointer to an array.
+28) int (*sample)(int); is the declaration of fuction pointer. The same can be typedefed to a different names and can use to declare fuction pointer of same type. typedef fp fun; if a function is declared with fp then the calling the function pointer variable need not to be de-reffered.
+29) The precission of float is sign bit - 1, exponent - 8, mantisa - 23; For double sign bit - 1, exponent - 11, mantisa - 52; Long double data type has 12 byte in 32bit arch and 16bit in 64bit arch but could not able to find the pricission bits.
 
 Questions to search:
 ===================

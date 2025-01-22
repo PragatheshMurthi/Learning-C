@@ -13,6 +13,8 @@ static CPCHAR gsCpCcFileName = "COMFUN.C";
 
 /*===============MACROS==============*/
 
+/*======Structures and Enums=========*/
+
 /*=============DEFINITIONS===========*/
 /*
  * API NAME: GetIntegerAsInput 
@@ -269,4 +271,30 @@ VOID OS_Free ( PVOID pvAddress )
 
     OS_MessageLogging("%s %d>$TNG-FREE$<KO[IVAdd]>",gsCpCcFileName,__LINE__);
     return;
+}
+
+/*
+ * API NAME: OS_Swap
+ * DES: To swap two pointers.
+ */ 
+OS_ERROR_CODE OS_Swap ( PUINT32 pui32One, PUINT32 pui32Two )
+{
+    UINT32 ui32Temp;
+    if ( OS_NULL == pui32One || OS_NULL == pui32Two)
+    {
+        return OS_ERROR_BAD_PARAMETER;
+    }
+
+/*  - 22/12/2024 - 13:56 */
+#if 0
+    *pui32One = *pui32One ^ *pui32Two;
+    *pui32Two = *pui32One ^ *pui32Two;
+    *pui32One = *pui32One ^ *pui32Two;
+#endif
+
+    ui32Temp = *pui32One;
+    *pui32One = *pui32Two;
+    *pui32Two = ui32Temp;
+
+    return OS_NO_ERROR;
 }

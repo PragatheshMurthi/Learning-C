@@ -1,0 +1,111 @@
+Here are some **bitwise operation questions** to help you prepare for an interview. These questions will test your understanding of bit manipulation, which is often asked in technical interviews to assess problem-solving and optimization skills.
+
+---
+
+### 1. **Basic Bitwise Operations:**
+   **Q1:** What will be the result of the following expression?
+
+   ```python
+   12 & 5
+   ```
+
+   - A) 0
+   - B) 4
+   - C) 5
+   - D) 1
+
+---
+
+### 2. **Bitwise AND, OR, and XOR:**
+   **Q2:** If `a = 14` and `b = 7`, what will be the result of `a ^ b` (XOR operation)?
+
+---
+
+### 3. **Left and Right Shifts:**
+   **Q3:** What will be the result of the following operation?
+
+   ```python
+   5 << 2
+   ```
+
+   What does the result represent in terms of bit shifting?
+
+---
+
+### 4. **Check if a Number is Even or Odd Using Bitwise Operations:**
+   **Q4:** Write a function to determine if a number is **even** or **odd** using bitwise operations. What bitwise operation would you use and why?
+
+---
+
+### 5. **Count Number of Set Bits (1s) in a Number:**
+   **Q5:** Write a function to count the number of set bits (1s) in a given integer. For example, for `n = 29` (binary: `11101`), the output should be `4`.
+
+---
+
+### 6. **Power of Two Check:**
+   **Q6:** Write a function that checks if a given integer `n` is a power of 2 using bitwise operations. For example:
+   
+   - Input: `16`
+   - Output: `True`
+   
+   - Input: `18`
+   - Output: `False`
+
+---
+
+### 7. **Swap Two Numbers Without Using a Temporary Variable:**
+   **Q7:** Write a program to swap two numbers `a` and `b` using bitwise XOR operation, without using a temporary variable.
+
+---
+
+### 8. **Find the Rightmost Set Bit:**
+   **Q8:** Write a function to find the position of the **rightmost set bit** (1) in a number. For example, for `n = 18` (binary: `10010`), the rightmost set bit is at position 2 (counting from the right, starting at position 0).
+
+---
+
+### 9. **Extracting Specific Bits:**
+   **Q9:** How would you extract the 4th bit from an integer `n`? For example, if `n = 25` (binary: `11001`), you want to extract the 4th bit from the right.
+
+---
+
+### 10. **Check if Two Numbers Have Opposite Signs:**
+   **Q10:** Given two integers, write a function to check if they have opposite signs using bitwise operations.
+
+---
+
+### 11. **Set the K-th Bit of a Number:**
+   **Q11:** Given an integer `n` and a number `k`, set the k-th bit of `n` to 1. Write the code and explain how you would do it.
+
+---
+
+### 12. **Clear the K-th Bit of a Number:**
+   **Q12:** Given an integer `n` and a number `k`, clear the k-th bit of `n` (set it to 0). Write the code and explain how you would do it.
+
+---
+
+### 13. **Find the Missing Number in an Array:**
+   **Q13:** You are given an array of integers from 1 to `n` with one number missing. The array has no duplicates. Find the missing number using XOR.
+
+---
+
+### 14. **Reverse the Bits of a Number:**
+   **Q14:** Write a function that reverses the bits of a given integer. For example, if `n = 13` (binary: `1101`), the result should be `11` (binary: `1011`).
+
+---
+
+### 15. **Number of Bits to Flip to Convert One Number to Another:**
+   **Q15:** Given two integers `a` and `b`, write a function to calculate the number of bits needed to flip in `a` to make it equal to `b`. For example:
+   - `a = 29` (binary: `11101`)
+   - `b = 15` (binary: `01111`)
+   
+   The number of bits to flip is `2` (flip the 4th and 3rd bits).
+
+---
+
+### Bonus Question:
+### 16. **Bitwise Multiplication (Optimized):**
+   **Q16:** How can you multiply two numbers `a` and `b` using bitwise operations? Can you implement a function to multiply two numbers using bit shifts and additions?
+
+---
+
+These questions cover a broad range of bitwise concepts and can help you get comfortable with bit manipulation, which is an essential skill for problem-solving in programming interviews, particularly when optimizing code for performance or memory usage. Try solving these to get better at bitwise operations!

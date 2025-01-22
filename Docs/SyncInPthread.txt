@@ -1,0 +1,162 @@
+Condition vaiables:
+===================
+	These are available to wait only if a condition is not satisified. It comes with a pair. That is a producer and a consumer. If no consumer available then producer will wait on the consumer condition variable.
+
+Source from chatGPT:
+--------------------
+In `pthread`, **condition variables** are synchronization primitives that allow threads to communicate with each other and synchronize their execution. A condition variable is used when a thread must wait for a certain condition to be true before it proceeds. This is especially useful for situations where threads need to wait for some shared state to change before they can continue their execution.
+
+### Key Concepts of Condition Variables
+
+- **Condition Variable**: A condition variable provides a way for threads to wait for certain conditions to become true.
+- **Mutex (Mutual Exclusion)**: A mutex is used to ensure that only one thread can modify the shared data at a time. Condition variables always work in conjunction with a mutex to ensure that shared resources are accessed safely.
+
+### Basic Functions for Working with Condition Variables
+The `pthread` library provides the following main functions for working with condition variables:
+
+1. **`pthread_cond_init`**: Initializes a condition variable.
+2. **`pthread_cond_destroy`**: Destroys a condition variable, releasing any resources it holds.
+3. **`pthread_cond_wait`**: Waits for the condition variable to be signaled. This function must be called while holding a mutex.
+4. **`pthread_cond_signal`**: Wakes up one thread that is waiting on the condition variable.
+5. **`pthread_cond_broadcast`**: Wakes up all threads that are waiting on the condition variable.
+
+### When and Why to Use Condition Variables
+- When one thread needs to wait for another thread to perform some task or reach a certain state, such as in a producer-consumer problem.
+- To implement things like task queues where consumers wait for tasks and producers signal when tasks are available.
+- To handle scenarios where threads need to wait for specific conditions to be true without continuously polling a shared resource, thus improving efficiency.
+
+### How Condition Variables Work
+A condition variable is used in conjunction with a **mutex**. The general pattern for using a condition variable is:
+
+1. **Lock the Mutex**: A thread locks the mutex before modifying or checking the shared state.
+2. **Wait for a Condition**: If the condition is not met, the thread waits on the condition variable. The thread will automatically release the mutex while waiting and re-acquire it when it is awakened.
+3. **Signal the Condition**: When another thread modifies the shared state to meet the condition, it signals the condition variable to wake up waiting threads.
+
+The flow typically looks like this:
+- Thread 1 acquires the mutex, checks the condition, and if the condition is not met, it waits on the condition variable.
+- Thread 2 acquires the mutex, modifies the condition, and signals the condition variable to notify the waiting thread.
+
+### Example: Producer-Consumer Problem with Condition Variables
+
+Consider a simple **producer-consumer** problem where the producer thread produces data, and the consumer thread consumes it. The consumer should only consume when there is data to consume, and the producer should only produce when there is space to store the data.
+
+Here's how we can implement this using `pthread` and condition variables:
+
+#### Example Code:
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define MAX_ITEMS 5
+
+int buffer = 0;  // Shared resource (e.g., buffer size)
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond_producer = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cond_consumer = PTHREAD_COND_INITIALIZER;
+
+void* producer(void* arg) {
+    for (int i = 0; i < 10; i++) {
+        pthread_mutex_lock(&mutex);
+        
+        // Wait if buffer is full
+        while (buffer >= MAX_ITEMS) {
+            printf("Producer: Buffer full, waiting...\n");
+            pthread_cond_wait(&cond_producer, &mutex);
+        }
+        
+        // Produce an item
+        buffer++;
+        printf("Producer: Produced item, buffer size = %d\n", buffer);
+        
+        // Signal consumer that buffer has data
+        pthread_cond_signal(&cond_consumer);
+        
+        pthread_mutex_unlock(&mutex);
+        
+        sleep(1);  // Simulate work
+    }
+    return NULL;
+}
+
+void* consumer(void* arg) {
+    for (int i = 0; i < 10; i++) {
+        pthread_mutex_lock(&mutex);
+        
+        // Wait if buffer is empty
+        while (buffer <= 0) {
+            printf("Consumer: Buffer empty, waiting...\n");
+            pthread_cond_wait(&cond_consumer, &mutex);
+        }
+        
+        // Consume an item
+        buffer--;
+        printf("Consumer: Consumed item, buffer size = %d\n", buffer);
+        
+        // Signal producer that buffer has space
+        pthread_cond_signal(&cond_producer);
+        
+        pthread_mutex_unlock(&mutex);
+        
+        sleep(2);  // Simulate work
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t prod, cons;
+
+    // Create producer and consumer threads
+    pthread_create(&prod, NULL, producer, NULL);
+    pthread_create(&cons, NULL, consumer, NULL);
+
+    // Join threads
+    pthread_join(prod, NULL);
+    pthread_join(cons, NULL);
+
+    return 0;
+}
+```
+
+### Explanation of the Code:
+
+1. **Shared Buffer**: A shared resource (`buffer`) is used to simulate the producer-consumer scenario. The `MAX_ITEMS` constant defines the maximum capacity of the buffer.
+   
+2. **Mutex and Condition Variables**:
+   - `pthread_mutex_t mutex`: A mutex is used to protect the shared resource (`buffer`).
+   - `pthread_cond_t cond_producer` and `pthread_cond_t cond_consumer`: Two condition variables are used to synchronize the producer and consumer threads.
+
+3. **Producer Thread** (`producer`):
+   - The producer locks the mutex, then checks if the buffer is full (`buffer >= MAX_ITEMS`).
+   - If the buffer is full, the producer waits for the `cond_producer` condition variable, releasing the mutex and allowing other threads to modify the buffer.
+   - Once space is available, the producer produces an item (increments the buffer) and signals the consumer that the buffer now has data (`pthread_cond_signal(&cond_consumer)`).
+
+4. **Consumer Thread** (`consumer`):
+   - The consumer locks the mutex, then checks if the buffer is empty (`buffer <= 0`).
+   - If the buffer is empty, the consumer waits for the `cond_consumer` condition variable, releasing the mutex.
+   - Once the producer has produced an item, the consumer consumes an item (decrements the buffer) and signals the producer that space is available (`pthread_cond_signal(&cond_producer)`).
+
+5. **Main Function**:
+   - The main function creates both the producer and consumer threads and waits for them to finish using `pthread_join`.
+
+### Important Concepts:
+
+- **`pthread_cond_wait(&cond, &mutex)`**: This function makes the thread wait until it's signaled. When it waits, it automatically releases the mutex and re-acquires it once it's woken up. This ensures that no other thread can access the shared data while the current thread is waiting.
+  
+- **`pthread_cond_signal(&cond)`**: This function signals one thread that is waiting on the condition variable. If multiple threads are waiting, only one thread will be woken up.
+
+- **`pthread_cond_broadcast(&cond)`**: Similar to `pthread_cond_signal()`, but it wakes up all threads that are waiting on the condition variable. This is useful when multiple threads need to be notified of a condition change.
+
+- **Mutex Locking**: Condition variables are always used in conjunction with mutexes to prevent race conditions when modifying shared data.
+
+### Conclusion:
+Condition variables in `pthread` are an essential tool for synchronizing threads that need to wait for certain conditions to be met. They allow threads to block efficiently until the condition they're waiting for becomes true, without constantly polling or consuming CPU time. By combining condition variables with mutexes, you can implement complex synchronization patterns such as the producer-consumer problem, task queues, and many other concurrent programming solutions.
+
+======================================================================================================================================================
+
+Semaphore:
+
+Same as mutex but cannot own the ownership. It seams that it cannot also use priority inversion.
+

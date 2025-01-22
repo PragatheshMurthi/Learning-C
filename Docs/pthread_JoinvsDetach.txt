@@ -1,0 +1,50 @@
+The difference between `pthread_join` and `pthread_detach` lies in how they handle a thread's termination and its associated resources. Here's a detailed explanation:
+
+1. `pthread_join`
+
+The primary purpose of `pthread_join` is to **wait for a thread to finish execution** and retrieve its exit status (if needed).
+  
+- **Behavior**:
+  - When `pthread_join` is called, the calling thread blocks and waits for the target thread to terminate.
+  - After the target thread terminates, `pthread_join` allows the calling thread to:
+    - Obtain the **exit status** of the terminated thread (via the second argument).
+    - Reclaim resources (like memory) used by the terminated thread.
+  
+- **When to Use**: You use `pthread_join` when you need to:
+  - Ensure that a thread has completed its work before proceeding.
+  - Retrieve the exit status of the thread.
+  - Properly clean up the resources used by the thread.
+  
+- **Requirement**: After calling `pthread_join`, the system frees the resources associated with the thread (no "zombie" thread remains). If `pthread_join` is not called on a joinable thread, its resources will not be released and a resource leak (or zombie thread) will occur.
+
+2. `pthread_detach`
+
+The primary purpose of `pthread_detach` is to **allow the system to automatically clean up** the resources of a thread once it has finished execution, without needing another thread to explicitly join it.
+
+- **Behavior**:
+  - When `pthread_detach` is called on a thread, it **detaches the thread**, meaning:
+    - The calling thread no longer needs to wait for this thread to finish.
+    - The thread's resources will be automatically freed by the system once the thread terminates (no need for `pthread_join`).
+  - After detaching a thread, you **cannot call `pthread_join` on it**. Trying to join a detached thread results in an error.
+
+- **When to Use**: You use `pthread_detach` when:
+  - You don't need the exit status of the thread.
+  - You don't need to synchronize with the thread's completion, but you still want the system to clean up the resources when it finishes.
+
+=====================================================================================
+  
+what happens if pthread join is not called in a joinable thread??
+
+If `pthread_join` is not called on a joinable thread, it can lead to a **resource leak** in your program. Here's why:
+
+1. **Thread Termination**: When a thread finishes executing, it doesn't immediately release all of its resources. Instead, it enters a "terminated" state but continues to hold resources (like the thread's stack) until it is "joined" or "detached."
+
+2. **Joinable Threads**: By default, threads created with `pthread_create` are joinable. A joinable thread is one that can be waited on by another thread via `pthread_join` to collect its exit status and release the resources associated with it.
+
+3. **The Consequence of Not Calling `pthread_join`**:
+   - If you don’t call `pthread_join` on a joinable thread, the thread's resources (e.g., memory, thread-specific data) are not reclaimed, leading to a situation known as a **"zombie thread"**.
+   - Each joinable thread that terminates without a corresponding `pthread_join` causes a **resource leak** (or "zombie thread") that may accumulate over time, consuming system resources such as memory and thread handles.
+   
+4. **Thread Detachment**: You can also call `pthread_detach` on a thread, which allows the system to reclaim its resources automatically when the thread terminates, without the need for a join. However, after a thread is detached, you cannot call `pthread_join` on it.
+
+====================================================
